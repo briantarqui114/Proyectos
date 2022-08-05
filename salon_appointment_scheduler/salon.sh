@@ -1,6 +1,5 @@
 #!/bin/bash
 PSQL="psql --username=freecodecamp --dbname=salon --tuples-only -c"
-TRUNCATE_TABLES=$($PSQL "TRUNCATE appointments, customers")
 
 SERVICES_MENU() {
   
@@ -36,16 +35,20 @@ SERVICES_MENU() {
       INSERT_CUSTOMER_INFO=$($PSQL "INSERT INTO customers(phone, name) VALUES('$CUSTOMER_PHONE','$CUSTOMER_NAME')")
     fi
 
-    echo -e "\nWhat time would you like your cut, Fabio?"
-    read SERVICE_TIME
+    CUSTOMER_ID=$($PSQL "SELECT customer_id FROM customers WHERE phone = '$CUSTOMER_PHONE' ")
+    SERVICE=$($PSQL "SELECT name FROM services WHERE service_id = '$SERVICE_ID_SELECTED' ")
 
+    echo -e "\nWhat time would you like your $SERVICE, $CUSTOMER_NAME?"
+    read SERVICE_TIME
+    INSERT_APPOINTMENT=$($PSQL "INSERT INTO appointments(customer_id, service_id, time) VALUES($CUSTOMER_ID, $SERVICE_ID_SELECTED, '$SERVICE_TIME')")
+
+
+    echo -e "\nI have put you down for a $SERVICE at $SERVICE_TIME, $CUSTOMER_NAME."
 
   else # Si no esta entre las opciones 
     SERVICES_MENU "\nI could not find that service. What would you like today?"
   fi
 
 }
-
-
 
 SERVICES_MENU
